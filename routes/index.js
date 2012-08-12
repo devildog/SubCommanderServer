@@ -45,7 +45,7 @@ exports.myStats = function(req, res){
   var user = new User()
    user.findUserByID(req.params.id, function(err, result){
       if(err) {
-        res.json({error:'unable to find user'});
+        res.json({error:'unable to find user stats'});
         return;
       }
 
