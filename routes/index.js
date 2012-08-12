@@ -37,21 +37,19 @@ exports.gameOver= function(req, res){
 
       result.remove(); 
 
-    });
-
-
+    }); 
 
 };
 
 exports.myStats = function(req, res){
   var user = new User()
-   user.getGameByID(req.params.id, function(err, result){
+   user.findUserByID(req.params.id, function(err, result){
       if(err) {
-        res.json({error:'unable to find game'});
+        res.json({error:'unable to find user'});
         return;
       }
 
-       res.json(result);
+       res.json(result.stats);
 
     });
 
