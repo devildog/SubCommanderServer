@@ -69,17 +69,17 @@ UserSchema.method('updateStats', function(userID, stats, rankPts, callback){
 
 
  
-UserSchema.method('findUserByID', function(userID, gameid, callback){
+UserSchema.method('findUserByID', function(userID, callback){
     // console.log('findUserByID supplied game id ' + gameid)
 	User.findOne({_id:userID},function(err, users){
 		//console.log('inside findUserById ' + users);
 		if(err)
 			return callback(err);
 		if(!users)
-			return callback(null,null,  false);
+			return callback(null, false);
 		 
 			//console.log('did not find any games' + games == null);
-			return callback(null, gameid, users);
+			return callback(null, users);
 
 		});
 	});
