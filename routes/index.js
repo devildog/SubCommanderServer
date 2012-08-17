@@ -408,12 +408,12 @@ exports.registerPost = function(req, res){
   var user = new User();
   user.findByUserName(req.body.username, function(err, result){
     if(err){
-      res.json({"error":"UserName already exists"});
+      res.json({"error":"Sorry, unable to register you right now. Please try later"});
       return;
     }
       console.log('registerPost user ' + result);
       if(result != false ){
-        res.json({"error":"Email address already exists"});
+        res.json({"error":"User name already exists"});
         return;
       }
       user.username = req.body.username;
