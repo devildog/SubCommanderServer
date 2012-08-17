@@ -468,10 +468,12 @@ exports.updateGameChange = function(req, res){
 
         //console.log("UpdateGameChange:getGameByID "  + gameJSON);
         results.changePackets  = JSON.stringify(gameJSON.turnPackets);
-        results.nextPlayer = gameJSON.nextPlayer 
-        results.activePlayer = gameJSON.nextPlayer
+        results.nextPlayer = gameJSON.nextPlayer;
+        results.activePlayer = gameJSON.nextPlayer;
         results.date = new Date();
         results.turn = gameJSON.turn;
+        results.player1.stats = gameJSON.player1_stats;
+        results.player2.stats = gameJSON.player2_stats;
         results.save();
 
      }
