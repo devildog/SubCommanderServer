@@ -16,6 +16,9 @@ var GameSchema = new Schema({
   nextPlayer: String,
   gameData: String,
   changePackets: String, 
+  player1_stats: String,
+  player2_stats: String,
+  gameOver: String,
   date: Date
 });
 GameSchema.method('getGameByID', function(id, callback){

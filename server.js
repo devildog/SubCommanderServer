@@ -117,7 +117,7 @@ app.get('/loginFailed', routes.loginFailed);
 app.get('/loginSuccess',ensureAuthenticated, routes.loginSuccess);
 app.post('/gameOver/:id', routes.gameOver);
 app.get('/myStats/:id', routes.myStats);
-app.get('/updateStats/:id', routes.updateStats);
+app.post('/updateMyStats/:id', routes.updateMyStats);
 
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next(); }

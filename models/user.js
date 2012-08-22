@@ -9,10 +9,22 @@ var UserSchema = new Schema({
 
   userid: String,
   nickname: String,
-  rank:String,
+  rank: Number,
   admin: String,
   stats: String, 
   date: Date
+});
+UserSchema.method('getCount', function(test){
+			var count=0; 
+			for (i=0;i<test.length;i++)
+			{
+				console.log(i + ' ' + test[i]);
+				if(test[i].trim().length>0){
+					count++;
+				}
+			}
+			return count;
+
 });
 UserSchema.method('updateStats', function(userID, stats, rankPts, callback){
 	User.findOne({_id:userID},function(err, users){
@@ -21,47 +33,99 @@ UserSchema.method('updateStats', function(userID, stats, rankPts, callback){
 			return callback(err);
 		if(!users)
 			return callback(null,null,  false);
-		
+		console.error('updateStats inside USER '  + stats.spotted.bomber);
 
+		if (users.rank ==null) { users.rank = 0; }
 		users.rank = users.rank+rankPts;
-		if(users.stats == "" ){
-			users.stats = stats;
+		if(users.stats == null || users.stats=='' ){
+			
+			var test = stats.spotted.bomber.trim().split(' '); 
+			var count = users.getCount(test)
+			stats.spotted.bomber  = count;
+			test = stats.spotted.cargo.trim().split(' ');
+			count = users.getCount(test)
+			 stats.spotted.cargo  = count;
+			test = stats.spotted.destroyer.trim().split(' ');
+			count = users.getCount(test)
+			 stats.spotted.destroyer  = count;
+			test = stats.spotted.transport.trim().split(' ');
+			count = users.getCount(test)
+			 stats.spotted.transport  = count;
+			test = stats.spotted.submarine.trim().split(' ');
+			count = users.getCount(test)
+			 stats.spotted.submarine =count;
+
+			
+			users.stats = JSON.stringify(stats);
 			users.save();
 			return callback(null, users.stats);
 		}
-		var stats = JSON.parse(stats);
+		
+		//var stats = JSON.parse(stats);
 		var us = JSON.parse(users.stats);
-///{ shellsFired= 0, shellsHit =0, dive=0, surface=0, torpedosFired=0, 
-	//torpedosHit = 0, minesReleased =0,minesHit= 0, safeCargo = 0, safeTroops = 0,
-	// cargoLost=0, troopsLost = 0,sonar=0, depthChargesReleased=0,depthChargesHit = 0,
-	//shipsLost=0,  tonnageSunk =0, shipsSunk=0, planesShotDown = 0}
+		//"stats":{"shellsFired":9,"minesReleased":0,
+		//"spotted":{"bomber":"","cargo":"","destroyer":"","transport":"","submarine":"  21  19  20  18"},
+		//"cargoLost":0,"tonnageSunk":0,"torpedosHit":0,"sonar":0,"torpedosFired":0,
+		//"tonnage":{"bomber":0,"cargo":0,"destroyer":0,"transport":0,"submarine":20000},
+		//"shipsLost":0,"shipsSunk":0,"safeCargo":0,"sunk":{"bomber":0,"cargo":0,"destroyer":0,"transport":0,"submarine":4},
+		//"minesHit":0,"depthChargesHit":3,"shellsHit":24,"troopsLost":0,
+		//"lost":{"bomber":0,"cargo":0,"destroyer":2,"transport":0,"submarine":0},
+		//"planesShotDown":0,"planesLost":0,"dive":0,"depthChargesReleased":3,
+		//"safeTroops":0,"surface":0} 
 		us.shellsFired+= stats.shellsFired;
-		us.shellsHit+= stats.shellsFired;
-		us.dive+=stats.dive;
-		us.surface+=stats.surface;
-		us.torpedosFired+=stats.torpedosFired;
+		us.shellsHit+= stats.shellsHit;
+		var test = stats.spotted.bomber.trim().split(' '); 
+		var count = users.getCount(test)
+		us.spotted.bomber += count;
+		test = stats.spotted.cargo.trim().split(' ');
+		var count = users.getCount(test)
+		us.spotted.cargo += count;
+		test = stats.spotted.destroyer.trim().split(' ');
+		var count = users.getCount(test)
+		us.spotted.destroyer +=count;
+		test = stats.spotted.transport.trim().split(' ');
+		var count = users.getCount(test)
+		us.spotted.transport += count;
+		test = stats.spotted.submarine.trim().split(' ');
+		us.spotted.submarine +=count;
+		us.cargoLost += stats.cargoLost;
+		us.tonnageSunk += stats.tonnageSunk;
 		us.torpedosHit += stats.torpedosHit;
-		us.minesReleased+=stats.minesReleased;
-		us.minesHit += stats.minesHit;
-		us.safeCargo+=stats.safeCargo;
-		us.safeTroops+=stats.safeTroops;
-		us.cargoLost+= stats.cargoLost;
-		us.troopsLost += stats.troopsLost;
 		us.sonar += stats.sonar;
-		us.depthChargesReleased += stats.depthChargesReleased;
-		us.depthChargesHit += stats.depthChargesHit;
+		us.torpedosFired += stats.torpedosFired;
+		us.tonnage.bomber += stats.tonnage.bomber;
+		us.tonnage.cargo +=stats.tonnage.cargo;
+		us.tonnage.destroyer+=stats.tonnage.destroyer;
+		us.tonnage.transport+=stats.tonnage.transport;
+		us.tonnage.submarine += stats.tonnage.submarine;
 		us.shipsLost += stats.shipsLost;
-		us.tonnageSunk+=stats.tonnageSunk;
 		us.shipsSunk += stats.shipsSunk;
-		us.planesShotdown += stats.planesShotDown;
+		us.safeCargo += stats.safeCargo;
+		us.sunk.bomber += stats.sunk.bomber;
+		us.sunk.cargo += stats.sunk.cargo;
+		us.sunk.destroyer += stats.sunk.destroyer;
+		us.sunk.transport += stats.sunk.transport;
+		us.sunk.submarine += stats.sunk.submarine;
+		us.lost.bomber += stats.lost.bomber;
+		us.lost.cargo += stats.lost.cargo;
+		us.lost.destroyer+=stats.lost.destroyer;
+		us.lost.transport += stats.lost.transport;
+		us.lost.submarine += stats.lost.submarine;
+		us.dive += stats.dive;
+		us.depthChargesReleased += stats.depthChargesReleased;
+		us.safeTroops += stats.safeTroops;
+		us.surface += stats.surface;
 
+		 
+	 
 		users.stats = JSON.stringify(us);
+
 		users.save();
  
 
 
 		//console.log('did not find any games' + games == null);
-		return callback(null, gameid, users);
+		return callback(null, users);
 
 		});
 });

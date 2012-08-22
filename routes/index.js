@@ -35,13 +35,21 @@ exports.gameOver= function(req, res){
         return;
       }
 
-      result.remove(); 
+      if(result.gameOver=="true") {
+          console.error("GameOver ... removing ");
+              result.remove(); 
+      }
+      else {
+        result.gameOver=true;
+        result.save();
+
+      }
+      res.json({ result:"okay"});
 
     }); 
 
 };
-
-
+ 
 
 exports.myStats = function(req, res){
   var user = new User()
@@ -50,8 +58,8 @@ exports.myStats = function(req, res){
         res.json({error:'unable to find user stats'});
         return;
       }
-
-       res.json(result.stats);
+        var  results = { stats:result.stats, points:result.rank};
+       res.json(results);
 
     });
 
@@ -90,6 +98,7 @@ exports.myavailablegames = function(req, res){
           myGame[result[i]._id].player1["faction"] =  faction
           myGame[result[i]._id].player1["id"]= result[i].player1;
           myGame[result[i]._id].player1["name"]=result[i].player1_nickname;
+          myGame[result[i]._id].gameOver = result[i].gameOver;
           myGame[result[i]._id].player2 = {};
          if (gameData.game.player2 != null){
            type = gameData.game.player2.gameSide;
@@ -150,40 +159,57 @@ exports.mywaitinggames = function(req, res){
         {
           //console.log(result[i]._id);
           //console.log(result[i].turn);
-          var gameData = JSON.parse(result[i].gameData);
-         // console.log('myavailablegames ' + JSON.stringify(gameData));
-          var type = gameData.game.player1.gameSide;
-          var faction = gameData.game.player1.faction;
-          myGame[result[i]._id] = {};
+          var future = new Date(result[i].date);
+          future.setDate(future.getDate()+5);
+          var current = new Date()
+          console.log ('game date ' + result[i].date + '  current date ' + current + ' future date ' + future);
+          console.log (' compare dates i ' + i + ' future ' + dates.compare(future, current));
+          if (result[i].player1 !=null && result[i].player2!=null && dates.compare(future, current) == -1 ){
 
-          myGame[result[i]._id].player1= {};
-          myGame[result[i]._id].player1["id"]= result[i].player1;
-          myGame[result[i]._id].player1["name"]=result[i].player1_nickname;
-          myGame[result[i]._id].player2 = {};
-          myGame[result[i]._id].player1["gametype"] = type
-          myGame[result[i]._id].player1["faction"] =  faction
-          myGame[result[i]._id].player2["id"] = result[i].player2;
-          myGame[result[i]._id].player2["name"] = result[i].player2_nickname;
-          if (gameData.game.player2 != null){
-           type = gameData.game.player2.gameSide;
-           faction = gameData.game.player2.faction;
-         }
-           else{
-            type="";
-          faction="";
+                 //a>b
+                result[i].gameOver=true;
+                result[i].nextPlayer = id;
+                result[i].save(); 
+             }else
+              {
+                  var gameData = JSON.parse(result[i].gameData);
+                 // console.log('myavailablegames ' + JSON.stringify(gameData));
+                  var type = gameData.game.player1.gameSide;
+                  var faction = gameData.game.player1.faction;
+                  myGame[result[i]._id] = {};
 
+                  myGame[result[i]._id].player1= {};
+                  myGame[result[i]._id].player1["id"]= result[i].player1;
+                  myGame[result[i]._id].player1["name"]=result[i].player1_nickname;
+                  myGame[result[i]._id].player2 = {};
+                  myGame[result[i]._id].player1["gametype"] = type
+                  myGame[result[i]._id].player1["faction"] =  faction
+                  myGame[result[i]._id].player2["id"] = result[i].player2;
+                  myGame[result[i]._id].player2["name"] = result[i].player2_nickname;
+                      if (gameData.game.player2 != null){
+                       type = gameData.game.player2.gameSide;
+                       faction = gameData.game.player2.faction;
+                     }
+                       else{
+                        type="";
+                      faction="";
+
+                      }
+                  myGame[result[i]._id].player2["gametype"] = type
+                  myGame[result[i]._id].player2["faction"] =  faction
+                  myGame[result[i]._id].turn = result[i].turn;
+                  myGame[result[i]._id].date = moment(result[i].date).format('dddd, MMMM Do YYYY, h:mm:ss a')
+               // myGame[result[i]._id].gameData = result[i].gameData;
+                
+              // console.log('available results ' + result[i].id );
+
+               // json = '{"' + result[i].id + '":{"player1":{"id":' + result[i].player1.id + ', "name":' + result[i].player1.nickname}, "player2":{"id":result[i].player2.id, "name":result[i].player2.nickname}, "turn":result[i].turn} };
+               //console.log('json result ' + myGame); 
+                }
+ 
           }
-          myGame[result[i]._id].player2["gametype"] = type
-          myGame[result[i]._id].player2["faction"] =  faction
-          myGame[result[i]._id].turn = result[i].turn;
-          myGame[result[i]._id].date = moment(result[i].date).format('dddd, MMMM Do YYYY, h:mm:ss a')
-         // myGame[result[i]._id].gameData = result[i].gameData;
           
-        // console.log('available results ' + result[i].id );
-
-         // json = '{"' + result[i].id + '":{"player1":{"id":' + result[i].player1.id + ', "name":' + result[i].player1.nickname}, "player2":{"id":result[i].player2.id, "name":result[i].player2.nickname}, "turn":result[i].turn} };
-         //console.log('json result ' + myGame); 
-        }
+    
         //console.log('MyAvailableGames  '  + myGame);
          
         res.json(myGame);
@@ -466,14 +492,15 @@ exports.updateGameChange = function(req, res){
      {
         var gameJSON = JSON.parse(gameData);
 
-        //console.log("UpdateGameChange:getGameByID "  + gameJSON);
+       // console.log("UpdateGameChange:getGameByID "  + gameJSON);
         results.changePackets  = JSON.stringify(gameJSON.turnPackets);
         results.nextPlayer = gameJSON.nextPlayer;
         results.activePlayer = gameJSON.nextPlayer;
         results.date = new Date();
         results.turn = gameJSON.turn;
-        results.player1.stats = gameJSON.player1_stats;
-        results.player2.stats = gameJSON.player2_stats;
+        results.player1_stats = JSON.stringify(gameJSON.player1_stats)
+        results.player2_stats = JSON.stringify(gameJSON.player2_stats)
+         
         results.save();
 
      }
@@ -516,25 +543,83 @@ exports.updateGame = function(req, res){
   } );
   
 }
-exports.updateStats = function(req, res){
+exports.updateMyStats = function(req, res){
   
+  var gameInfo = JSON.parse(req.body.gameInfo);
   var userID  = req.params.id;
-  var userStats = req.body.stats;
-  //console.log('updateStats post val ' + gameJSON);
+  var userStats = gameInfo.stats;
+  var turn = gameInfo.turn;
+  var points = gameInfo.points;
+  var gameID = gameInfo.gameID;
+  console.log('updateStats post val ' + points);
+  console.log('updateStats post val ' + userStats.shellsFired);
   var user = new User()
   
-  user.updateStats(userID, userStats, function(err, results){
+  user.updateStats(userID, userStats, points,  function(err, results){
      if(err) {
         console.log('error saving stats: error ' + err);
      }
      else
      {
-      res.json(results);
+
+        res.json(results);
      }
  
   } );
   
  
 
+}
+// Source: http://stackoverflow.com/questions/497790
+var dates = {
+    convert:function(d) {
+        // Converts the date in d to a date-object. The input can be:
+        //   a date object: returned without modification
+        //  an array      : Interpreted as [year,month,day]. NOTE: month is 0-11.
+        //   a number     : Interpreted as number of milliseconds
+        //                  since 1 Jan 1970 (a timestamp) 
+        //   a string     : Any format supported by the javascript engine, like
+        //                  "YYYY/MM/DD", "MM/DD/YYYY", "Jan 31 2009" etc.
+        //  an object     : Interpreted as an object with year, month and date
+        //                  attributes.  **NOTE** month is 0-11.
+        return (
+            d.constructor === Date ? d :
+            d.constructor === Array ? new Date(d[0],d[1],d[2]) :
+            d.constructor === Number ? new Date(d) :
+            d.constructor === String ? new Date(d) :
+            typeof d === "object" ? new Date(d.year,d.month,d.date) :
+            NaN
+        );
+    },
+    compare:function(a,b) {
+        // Compare two dates (could be of any type supported by the convert
+        // function above) and returns:
+        //  -1 : if a < b
+        //   0 : if a = b
+        //   1 : if a > b
+        // NaN : if a or b is an illegal date
+        // NOTE: The code inside isFinite does an assignment (=).
+        return (
+            isFinite(a=this.convert(a).valueOf()) &&
+            isFinite(b=this.convert(b).valueOf()) ?
+            (a>b)-(a<b) :
+            NaN
+        );
+    },
+    inRange:function(d,start,end) {
+        // Checks if date in d is between dates in start and end.
+        // Returns a boolean or NaN:
+        //    true  : if d is between start and end (inclusive)
+        //    false : if d is before start or after end
+        //    NaN   : if one or more of the dates is illegal.
+        // NOTE: The code inside isFinite does an assignment (=).
+       return (
+            isFinite(d=this.convert(d).valueOf()) &&
+            isFinite(start=this.convert(start).valueOf()) &&
+            isFinite(end=this.convert(end).valueOf()) ?
+            start <= d && d <= end :
+            NaN
+        );
+    }
 }
  
