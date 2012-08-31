@@ -457,7 +457,7 @@ exports.registerPost = function(req, res){
 
 
 };
-exports.getVersion = function(req, res){
+exports.gameVersion = function(req, res){
   res.json({version:"1.0"});
 
 }
