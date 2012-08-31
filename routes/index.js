@@ -100,6 +100,7 @@ exports.myavailablegames = function(req, res){
           myGame[result[i]._id].player1["name"]=result[i].player1_nickname;
           myGame[result[i]._id].gameOver = result[i].gameOver;
           myGame[result[i]._id].player2 = {};
+
          if (gameData.game.player2 != null){
            type = gameData.game.player2.gameSide;
            faction = gameData.game.player2.faction;
@@ -456,6 +457,10 @@ exports.registerPost = function(req, res){
 
 
 };
+exports.getVersion = function(req, res){
+  res.json{version:"1.0"}
+
+}
 exports.loginFailed = function(req, res){
   res.json({"error":"Sorry, unable to log you in."});
 }
