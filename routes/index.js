@@ -458,7 +458,7 @@ exports.registerPost = function(req, res){
 
 };
 exports.getVersion = function(req, res){
-  res.json{version:"1.0"}
+  res.json({version:"1.0"});
 
 }
 exports.loginFailed = function(req, res){
