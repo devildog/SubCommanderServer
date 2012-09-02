@@ -499,8 +499,10 @@ exports.updateGameChange = function(req, res){
      {
 
         var gameJSON = JSON.parse(gameData);
-
-        if( game.turn > gameJSON.turn || game.changePackets !="" ){
+        // console.log("WFT"   + results.changePackets !="");
+        //  console.log(results.turn  + "    gameJSON.turn: " + gameJSON.turn + "   ");
+        // console.log("post logging");
+        if( results.turn > gameJSON.turn || results.changePackets !="" ){
           res.json({"id":gameid,"updated":false, error:"game turn already advanced or change packets not cleared"});
           return;
         }
