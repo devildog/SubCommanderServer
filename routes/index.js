@@ -459,7 +459,7 @@ exports.registerPost = function(req, res){
 
 };
 exports.gameVersion = function(req, res){
-  res.json({version:"1.0"});
+  res.json({version:"1.1"});
 
 }
 exports.loginFailed = function(req, res){
@@ -500,11 +500,18 @@ exports.updateGameChange = function(req, res){
 
         var gameJSON = JSON.parse(gameData);
         // console.log("WFT"   + results.changePackets !="");
-        //  console.log(results.turn  + "    gameJSON.turn: " + gameJSON.turn + "   ");
-        // console.log("post logging");
-        if( results.turn > gameJSON.turn || results.changePackets !="" ){
+        console.log(results.turn  + "    gameJSON.turn: " + gameJSON.turn + "   ");
+        //console.log("post logging");
+        if( results.turn == gameJSON.turn || results.changePackets !="" ){
+          console.log("game turn already advanced or change packets not cleared");
           res.json({"id":gameid,"updated":false, error:"game turn already advanced or change packets not cleared"});
           return;
+        }
+        if(results.nextPlayer == gameJSON.nextPlayer) {
+          console.log("Next Player already set to gameJSON next player. Ignoring turn packets");
+          res.json({"id":gameid,"updated":false, error:"game turn already advanced next player has been set already"});
+          return;
+
         }
        // console.log("UpdateGameChange:getGameByID "  + gameJSON);
         results.changePackets  = JSON.stringify(gameJSON.turnPackets);
