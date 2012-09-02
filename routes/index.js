@@ -36,7 +36,7 @@ exports.gameOver= function(req, res){
       }
 
       if(result.gameOver=="true") {
-          console.error("GameOver ... removing ");
+         // console.error("GameOver ... removing ");
               result.remove(); 
       }
       else {
@@ -73,7 +73,7 @@ exports.myavailablegames = function(req, res){
   game.getAvailableGamesByID(id, function(err, result){
         var myGame ={};
      if(err) {
-        console.log('available: error ' + err);
+      //  console.log('available: error ' + err);
         res.json({"error":"error loading game"});
      }
      else
@@ -145,7 +145,7 @@ exports.mywaitinggames = function(req, res){
   game.getWaitingGamesByID(id, function(err, result){
         var myGame ={};
      if(err) {
-        console.log('waiting: error ' + err);
+      //  console.log('waiting: error ' + err);
         res.json({"error":"error loading game"});
      }
      else
@@ -163,8 +163,8 @@ exports.mywaitinggames = function(req, res){
           var future = new Date(result[i].date);
           future.setDate(future.getDate()+5);
           var current = new Date()
-          console.log ('game date ' + result[i].date + '  current date ' + current + ' future date ' + future);
-          console.log (' compare dates i ' + i + ' future ' + dates.compare(future, current));
+        //  console.log ('game date ' + result[i].date + '  current date ' + current + ' future date ' + future);
+        //  console.log (' compare dates i ' + i + ' future ' + dates.compare(future, current));
           if (result[i].player1 !=null && result[i].player2!=null && dates.compare(future, current) == -1 ){
 
                  //a>b
@@ -230,7 +230,7 @@ exports.gamesWaitingUsers = function(req, res){
   var myGame ={};
   game.getGamesWaitingUsers(id, function(err, result){
      if(err) {
-        console.log('games waiting users error: ' + err);
+       // console.log('games waiting users error: ' + err);
      }
      else
      {
@@ -353,14 +353,14 @@ exports.available = function(req, res){
   var response = {"uid":id, "available":[]};
   game.getAvailableGamesByID(id, function(err, result){
      if(err) {
-        console.log('available: error ' + err);
+      //  console.log('available: error ' + err);
      }
      else
      {
         
         for ( var i = 0;i<result.length;i++)
         {
-          console.log('available results ' + result[i].id );
+          //console.log('available results ' + result[i].id );
           response.available.push(result[i].id);
         }
 
@@ -381,14 +381,14 @@ exports.waiting = function(req, res){
  var response =  { "uid":id, "waiting":[ ]};
   game.getWaitingGamesByID(id, function(err, result){
     if(err) {
-        console.log('waiting: error ' + err);
+        //console.log('waiting: error ' + err);
      }
      else
      {
         
         for ( var i = 0;i<result.length;i++)
         {
-          console.log('waiting results ' + result[i].id );
+        //  console.log('waiting results ' + result[i].id );
           response.waiting.push(result[i].id);
         }
 
@@ -408,7 +408,8 @@ exports.create = function(req, res){
 
   // var gameType = req.body.gameSide;
   // var nickname = req.body.nickname;
-  console.log('create new game called with id ' + id);
+
+//  console.log('create new game called with id ' + id);
   var game = new Game();
 
   game.player1 = id;
@@ -438,7 +439,7 @@ exports.registerPost = function(req, res){
       res.json({"error":"Sorry, unable to register you right now. Please try later"});
       return;
     }
-      console.log('registerPost user ' + result);
+     // console.log('registerPost user ' + result);
       if(result != false ){
         res.json({"error":"User name already exists"});
         return;
@@ -466,12 +467,12 @@ exports.loginFailed = function(req, res){
 }
 exports.loginSuccess = function(req,res){
 
-  console.log("LoginSuccess pre stringify");
+  //console.log("LoginSuccess pre stringify");
   res.json(JSON.stringify(req.user));
 }
 exports.loginPost = function(req, res){
 
-   console.log('loginPost ');
+//console.log('loginPost ');
 passport.authenticate('local', function(err, user, info) {
     if (err) { return res.json({"error":"Sorry, unable to log you in."}); }
     if (!user) { return res.json({"error":"Sorry, unable to log you in."});}
@@ -491,12 +492,18 @@ exports.updateGameChange = function(req, res){
  
   game.getGameByID(gameid, function(err, results){
      if(err) {
-        console.log('error saving game: error ' + err);
+          res.json({"id":gameid,"updated":false, error:err});
+          return;
      }
      else
      {
+
         var gameJSON = JSON.parse(gameData);
 
+        if( game.turn > gameJSON.turn || game.changePackets ~="" ){
+          res.json({"id":gameid,"updated":false, error:"game turn already advanced or change packets not cleared"});
+          return;
+        }
        // console.log("UpdateGameChange:getGameByID "  + gameJSON);
         results.changePackets  = JSON.stringify(gameJSON.turnPackets);
         results.nextPlayer = gameJSON.nextPlayer;
@@ -526,13 +533,14 @@ exports.updateGame = function(req, res){
 
   game.getGameByID(gameid, function(err, results){
      if(err) {
-        console.log('error saving game: error ' + err);
+         res.json({"id":gameid,"updated":false, error:err});
+         return;
      }
      else
      {
         var gameJSON = JSON.parse(gameData);
 
-        console.log(" HERE "  + gameJSON.game.activePlayer);
+        //console.log(" HERE "  + gameJSON.game.activePlayer);
         results.nextPlayer = gameJSON.game.activePlayer;
         results.turn = gameJSON.game.turn;
         console.log(gameJSON.game.player1.playerName);
@@ -556,8 +564,8 @@ exports.updateMyStats = function(req, res){
   var turn = gameInfo.turn;
   var points = gameInfo.points;
   var gameID = gameInfo.gameID;
-  console.log('updateStats post val ' + points);
-  console.log('updateStats post val ' + userStats.shellsFired);
+  //console.log('updateStats post val ' + points);
+  //console.log('updateStats post val ' + userStats.shellsFired);
   var user = new User()
   
   user.updateStats(userID, userStats, points,  function(err, results){
