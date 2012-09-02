@@ -500,7 +500,7 @@ exports.updateGameChange = function(req, res){
 
         var gameJSON = JSON.parse(gameData);
 
-        if( game.turn > gameJSON.turn || game.changePackets ~="" ){
+        if( game.turn > gameJSON.turn || game.changePackets !="" ){
           res.json({"id":gameid,"updated":false, error:"game turn already advanced or change packets not cleared"});
           return;
         }
