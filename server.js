@@ -60,8 +60,10 @@ passport.use(new LocalStrategy(
    // });
   }
 ));
- 
-mongoose.connect('mongodb://commander:t0rpedo!@ds033607.mongolab.com:33607/subcommander');
+// prod account
+ mongoose.connect('mongodb://commander:t0rpedo!@ds029387.mongolab.com:29387/subcommander');
+// free account
+//mongoose.connect('mongodb://commander:t0rpedo!@ds033607.mongolab.com:33607/subcommander');
 
 var app = module.exports = express.createServer();
 
