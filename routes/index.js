@@ -459,7 +459,7 @@ exports.registerPost = function(req, res){
 
 };
 exports.gameVersion = function(req, res){
-  res.json({version:"1.1"});
+  res.json({version:"1.2"});
 
 }
 exports.loginFailed = function(req, res){
