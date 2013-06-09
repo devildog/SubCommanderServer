@@ -7,7 +7,7 @@ I may resurect this for another game in the future, but for now it is not under 
 
 ##License##
 This work is under [MIT-LICENSE][]<br/>
-Copyright (c) 2012-2013 Roland Yonaba.
+Copyright (c) 2012-2013 Tim Weaver.
 
 > Permission is hereby granted, free of charge, to any person obtaining a copy<br/>
 > of this software and associated documentation files (the "Software"), to deal<br/>
